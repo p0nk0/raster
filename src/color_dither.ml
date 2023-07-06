@@ -1,6 +1,5 @@
 open Core
 
-(* assumes all images are greyscale *)
 let add_error ~image ~errors:(r, g, b) ~width ~height ~x ~y =
   if x < width - 1 (* east *)
   then

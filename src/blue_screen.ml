@@ -5,10 +5,8 @@ open Core
    corresponding position in the background image instead of just ignoring
    the background image and returning the foreground image. *)
 let transform ~foreground ~background =
-  Image.mapi foreground ~f:(fun ~x ~y (r, g, b) ->
-    if b > r + g
-    then Image.get background ~x ~y
-    else Image.get foreground ~x ~y)
+  Image.mapi foreground ~f:(fun ~x ~y ((r, g, b) as pixel) ->
+    if b > r + g then Image.get background ~x ~y else pixel)
 ;;
 
 let command =
