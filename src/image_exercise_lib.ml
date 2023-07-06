@@ -7,6 +7,7 @@ let command =
     ; "bluescreen", Blue_screen.command
     ; "blur", Blur.command
     ; "dither", Dither.command
+    ; "Color-dither", Color_dither.command
     ; "steganography", Steganography.command
     ]
 ;;

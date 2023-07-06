@@ -1,7 +1,7 @@
 open Core
 
 (* assumes all images are greyscale *)
-let add_error ~image ~error ~max ~width ~height ~x ~y =
+let add_error ~image ~error ~width ~height ~x ~y =
   if x < width - 1 (* east *)
   then
     Image.set
@@ -9,10 +9,8 @@ let add_error ~image ~error ~max ~width ~height ~x ~y =
       ~x:(x + 1)
       ~y
       (Pixel.of_int
-         (Int.min
-            max
-            (Pixel.red (Image.get image ~x:(x + 1) ~y)
-             + Int.of_float (7. /. 16. *. error))));
+         (Pixel.red (Image.get image ~x:(x + 1) ~y)
+          + Int.of_float (7. /. 16. *. error)));
   if x < width - 1 && y < height - 1 (* southeast *)
   then
     Image.set
@@ -20,10 +18,8 @@ let add_error ~image ~error ~max ~width ~height ~x ~y =
       ~x:(x + 1)
       ~y:(y + 1)
       (Pixel.of_int
-         (Int.min
-            max
-            (Pixel.red (Image.get image ~x:(x + 1) ~y:(y + 1))
-             + Int.of_float (1. /. 16. *. error))));
+         (Pixel.red (Image.get image ~x:(x + 1) ~y:(y + 1))
+          + Int.of_float (1. /. 16. *. error)));
   if y < height - 1 (* south *)
   then
     Image.set
@@ -31,10 +27,8 @@ let add_error ~image ~error ~max ~width ~height ~x ~y =
       ~x
       ~y:(y + 1)
       (Pixel.of_int
-         (Int.min
-            max
-            (Pixel.red (Image.get image ~x ~y:(y + 1))
-             + Int.of_float (5. /. 16. *. error))));
+         (Pixel.red (Image.get image ~x ~y:(y + 1))
+          + Int.of_float (5. /. 16. *. error)));
   if x > 0 && y < height - 1 (* southwest *)
   then
     Image.set
@@ -42,10 +36,8 @@ let add_error ~image ~error ~max ~width ~height ~x ~y =
       ~x:(x - 1)
       ~y:(y + 1)
       (Pixel.of_int
-         (Int.min
-            max
-            (Pixel.red (Image.get image ~x:(x - 1) ~y:(y + 1))
-             + Int.of_float (3. /. 16. *. error))))
+         (Pixel.red (Image.get image ~x:(x - 1) ~y:(y + 1))
+          + Int.of_float (3. /. 16. *. error)))
 ;;
 
 (* This should look familiar by now! *)
@@ -57,14 +49,7 @@ let transform image =
   Image.mapi grey ~f:(fun ~x ~y (old_value, _, _) ->
     let new_value = if old_value > max / 2 then max else 0 in
     let error = old_value - new_value in
-    add_error
-      ~image:grey
-      ~error:(Float.of_int error)
-      ~max
-      ~width
-      ~height
-      ~x
-      ~y;
+    add_error ~image:grey ~error:(Float.of_int error) ~width ~height ~x ~y;
     Pixel.of_int new_value)
 ;;
 
