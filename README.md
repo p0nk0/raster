@@ -485,3 +485,12 @@ An example output image created by 10,000 moves of 10 pixel-by-10 pixel regions:
 <img src="./images/reference-beach_portrait_mosaic.png" width="350">
 </center>
 
+#### What I've added
+  
+  * color dithering (with arbitrary number of channels)
+	* edge detection
+	* larger dithering (Jarvis-Judice-Ninke algorithm)
+	* bayer dithering
+	* "Return of the obra Dinn" colors
+
+
