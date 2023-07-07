@@ -4,12 +4,10 @@ let in_bounds width height x y = 0 <= x && x < width && 0 <= y && y < height
 let horrizontal_gradient = [ -1; 0; 1; -2; 0; 2; -1; 0; 1 ]
 let vertical_gradient = [ -1; -2; -1; 0; 0; 0; 1; 2; 1 ]
 
-let convolve image x y ~horrizontal =
-  let width = Image.width image in
-  let height = Image.height image in
+let convolve image x y width height ~horrizontal =
   let in_bounds = in_bounds width height in
   let positions =
-    Array.init 9 ~f:(fun i -> (i % width) + x - 1, (i / height) + y - 1)
+    Array.init 9 ~f:(fun i -> (i % 3) + x - 1, (i / 3) + y - 1)
   in
   let gradient =
     Array.of_list
@@ -23,15 +21,24 @@ let convolve image x y ~horrizontal =
 ;;
 
 let transform image =
-  let grey = Grayscale.transform image in
+  let blur = Blur.transform image ~radius:2 in
+  let grey = Grayscale.transform blur in
+  let max = Image.max_val grey in
+  let threshold = 0.4 *. Float.of_int max in
+  let white = Pixel.of_int max in
+  let width = Image.width image in
+  let height = Image.height image in
   Image.mapi grey ~f:(fun ~x ~y _ ->
     let grad_x =
-      Float.square (Float.of_int (convolve image x y ~horrizontal:true))
+      Float.square
+        (Float.of_int (convolve grey x y width height ~horrizontal:true))
     in
     let grad_y =
-      Float.square (Float.of_int (convolve image x y ~horrizontal:false))
+      Float.square
+        (Float.of_int (convolve grey x y width height ~horrizontal:false))
     in
-    Pixel.of_int (Int.of_float (Float.sqrt (grad_x +. grad_y))))
+    let grad = Float.sqrt (grad_x +. grad_y) in
+    if Float.compare grad threshold > 0 then white else Pixel.zero)
 ;;
 
 let command =
